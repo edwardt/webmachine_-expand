@@ -1,6 +1,6 @@
 Expand modules for webmachine REST tookit.
 v0.1:
-	* webmachine_mod : management drynamic modules for webmachine application
+	* webmachine_mod : management dynamic modules for webmachine application
 	* webmachine_config : management config file to start/stop drynamic modules with arguments
 
 --------------------
