@@ -1,0 +1,64 @@
+%% @author author <author@example.com>
+%% @copyright YYYY author.
+
+%% @doc Callbacks for the helloworld application.
+
+-module(helloworld_app).
+-author('author <author@example.com>').
+
+-behaviour(application).
+-export([start/2,stop/1]).
+
+
+%% @spec start(_Type, _StartArgs) -> ServerRet
+%% @doc application start callback for helloworld.
+start(_Type, _StartArgs) ->
+    helloworld_deps:ensure(),
+    Sup = helloworld_sup:start_link(),
+    db_init(),
+    webmachine_config:start(),
+    webmachine_mod:start(),
+    start_modules(),
+    Sup.
+
+%% @spec stop(_State) -> ServerRet
+%% @doc application stop callback for helloworld.
+stop(_State) ->
+    stop_modules(),
+    ok.
+
+db_init()->
+    case mnesia:system_info(extra_db_nodes) of
+	[]->
+	    mnesia:create_schema([node()]);
+	_ ->
+	    ok
+    end,
+    mnesia:start(),
+    mnesia:wait_for_tables(mnesia:system_info(local_tables), infinity).
+
+start_modules()->
+    case webmachine_config:get_opt(module) of
+	undefined ->
+	    ok;
+	Modules ->
+	    lists:foreach(
+	      fun({Module, Opts})->
+		      webmachine_mod:module(start, Module, Opts),
+		      io:format("** start module : ~p~n",[Module])
+	      end, Modules
+	     )
+    end.
+
+stop_modules()->
+    case webmachine_config:get_opt(module) of
+	undefined ->
+	    ok;
+	Modules ->
+	    lists:foreach(
+	      fun({Module, _Opts}) ->
+		      webmachine_mod:module(stop, Module, []),
+		      io:format("** stop module : ~p~n",[Module])
+	      end, Modules
+	     )
+    end.

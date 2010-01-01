@@ -1,0 +1,66 @@
+Expand modules for webmachine REST tookit.
+v0.1:
+	* webmachine_mod : management drynamic modules for webmachine application
+	* webmachine_config : management config file to start/stop drynamic modules with arguments
+
+--------------------
+Using :
+	Clone src/ebin of webmachine_expand from git repo.
+	Compile it with command : erl -make
+	Start new webmarchine application using erl scripts @ webmachine/scripts :
+		myapp/
+		myapp/priv/
+		myapp/priv/www/
+		myapp/src/
+		myapp/ebin/
+		myapp/deps/
+	Create new dir with name : conf -> myapp/conf/
+	Create new configuration file @ myapp/conf/ with name : default.cfg 
+		{module,[
+				{mod_example,[
+						{param1, "param1"},
+						{param2, "param2"},
+						{param3, "param3"}
+						]}
+			]}.
+	Caution : Content of default.cfg file must be an Erlang Term
+
+	Jump to webmachine_expand/ebin dir and then copy *.beam to myapp/ebin/
+	
+	Open myapp/src/myapp.app and modify it as below :
+		...
+			{modules, [
+					...
+					webmachine_mod,
+					webmachine_config
+				]}
+		...
+	Open myapp/src/myapp_app.erl and modify it as below :
+		start(_Type, _StartArgs) ->
+			myapp_deps:ensure(),
+			Sup = myapp_sup:start_link(),
+			webmachine_config:db_init(),
+			webmachine_config:start(),
+			webmachine_mod:start(),
+			webmachine_mod:start_modules(),
+			Sup.
+		stop(_State)->
+			webmachine_mod:stop_modules(),
+			ok.
+
+	Create module mod_example.erl with skeleton as below :
+		
+			-module(mod_example).
+			-behaviour(webmachine_mod). %% must be
+			%% webmachine_mod callbacks API
+			-export([start/1, stop/0]).
+	
+			start(Opts) ->
+				ok.
+
+			stop() ->
+				ok.
+
+	OK, Re-compile myapp and run it
+
+		

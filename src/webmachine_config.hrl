@@ -1,0 +1,3 @@
+-record(config,{key, val}).
+-record(state, {opts = []}).
+-define(CONFIG_FILE, "default.cfg").
