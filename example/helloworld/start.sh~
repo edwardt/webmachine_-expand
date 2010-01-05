@@ -1,3 +1,0 @@
-#!/bin/sh
-cd `dirname $0`
-exec erl -name helloworld@localhost -pa $PWD/ebin $PWD/deps/*/ebin $PWD/deps/*/deps/*/ebin -boot start_sasl -s helloworld

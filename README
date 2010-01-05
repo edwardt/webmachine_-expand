@@ -1,9 +1,11 @@
 Expand modules for webmachine REST tookit.
+===========================
+
 v0.1:
 	* webmachine_mod : management dynamic modules for webmachine application
 	* webmachine_config : management config file to start/stop drynamic modules with arguments
 
---------------------
+------------------------------------
 Using :
 	Clone src/ebin of webmachine_expand from git repo.
 	Compile it with command : erl -make
